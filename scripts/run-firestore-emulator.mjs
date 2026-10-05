@@ -14,7 +14,9 @@ await writeFile(configPath, JSON.stringify(configuration));
 const command =
   process.argv[2] === 'e2e'
     ? 'node scripts/firestore-e2e.mjs'
-    : 'tsx --test tests/firestore/*.test.ts';
+    : process.argv[2] === 'rules'
+      ? 'node node_modules/tsx/dist/cli.mjs --test tests/rules/*.test.ts'
+      : 'node node_modules/tsx/dist/cli.mjs --test tests/firestore/*.test.ts';
 const child = spawn(
   process.execPath,
   [

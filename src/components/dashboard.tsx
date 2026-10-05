@@ -1,5 +1,8 @@
 'use client';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
+import Link from 'next/link';
+import { watchApplications, changeApplication, logoutAdmin } from '@/lib/browser-store';
+import { dashboardResults } from '@/lib/dashboard-results';
 import { useRouter } from 'next/navigation';
 import {
   BriefcaseBusiness,
@@ -40,8 +43,12 @@ const formatDate = (date: string) =>
   });
 export function Dashboard({ username }: { username: string }) {
   const router = useRouter();
-  const [result, setResult] = useState<Results | null>(null);
+  const [allRows, setAllRows] = useState<ApplicationRecord[] | null>(null);
   const [filters, setFilters] = useState<Record<string, string>>({ sort: 'newest', page: '1' });
+  const result: Results | null = useMemo(
+    () => (allRows ? dashboardResults(allRows, filters) : null),
+    [allRows, filters],
+  );
   const [search, setSearch] = useState('');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -69,35 +76,21 @@ export function Dashboard({ username }: { username: string }) {
     if (deleting) deleteDialog.current?.showModal();
     else deleteDialog.current?.close();
   }, [deleting]);
-  const load = useCallback(
-    async (signal: AbortSignal) => {
-      setLoading(true);
-      setError('');
-      try {
-        const response = await fetch('/api/admin/applications?' + new URLSearchParams(filters), {
-          signal,
-          cache: 'no-store',
-        });
-        if (response.status === 401) {
-          router.replace('/admin/login');
-          return;
-        }
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error);
-        setResult(data);
-      } catch (e) {
-        if (!signal.aborted) setError(e instanceof Error ? e.message : 'تعذر تحميل الطلبات');
-      } finally {
-        if (!signal.aborted) setLoading(false);
-      }
-    },
-    [filters, router],
-  );
   useEffect(() => {
-    const controller = new AbortController();
-    void load(controller.signal);
-    return () => controller.abort();
-  }, [load, revision]);
+    setLoading(true);
+    setError('');
+    return watchApplications(
+      (rows) => {
+        setAllRows(rows);
+        setLoading(false);
+      },
+      () => {
+        setAllRows(null);
+        setLoading(false);
+        setError('تعذر تحميل الطلبات. تحقق من اتصالك وصلاحية دخولك.');
+      },
+    );
+  }, [revision]);
   function filter(key: string, value: string) {
     setFilters((f) => ({ ...f, [key]: value, page: '1' }));
   }
@@ -106,22 +99,11 @@ export function Dashboard({ username }: { username: string }) {
     setBusy(true);
     setError('');
     try {
-      const response = await fetch('/api/admin/applications/' + id, {
-        method,
-        headers: { 'Content-Type': 'application/json' },
-        body: method === 'PATCH' ? JSON.stringify({ status }) : undefined,
-      });
-      const data = await response.json();
-      if (response.status === 401) {
-        router.replace('/admin/login');
-        return;
-      }
-      if (!response.ok) throw new Error(data.error);
+      await changeApplication(id, method, status);
       setToast(method === 'DELETE' ? 'تم حذف الطلب بنجاح' : 'تم تحديث حالة الطلب');
       setDeleting(null);
       if (method === 'DELETE') setSelected(null);
       else setSelected((s) => (s?.id === id ? { ...s, status: status! } : s));
-      setRevision((r) => r + 1);
     } catch (e) {
       setError(e instanceof Error ? e.message : 'تعذر تنفيذ العملية');
     } finally {
@@ -131,8 +113,7 @@ export function Dashboard({ username }: { username: string }) {
   async function logout() {
     setBusy(true);
     try {
-      const response = await fetch('/api/auth/logout', { method: 'POST' });
-      if (!response.ok) throw new Error('تعذر تسجيل الخروج');
+      await logoutAdmin();
       router.replace('/admin/login');
       router.refresh();
     } catch {
@@ -160,12 +141,12 @@ export function Dashboard({ username }: { username: string }) {
       <aside className="admin-sidebar">
         <Logo />
         <span className="admin-label">مساحة العمل</span>
-        <a className="sidebar-active" href="/admin">
+        <Link className="sidebar-active" href="/admin/">
           <BriefcaseBusiness size={20} /> طلبات التوظيف
-        </a>
-        <a href="/" target="_blank" rel="noreferrer">
+        </Link>
+        <Link href="/" target="_blank" rel="noreferrer">
           <ArrowUpLeft size={20} /> عرض الموقع
-        </a>
+        </Link>
         <div className="sidebar-bottom">
           <span className="admin-avatar">{username.slice(0, 1).toUpperCase()}</span>
           <div>

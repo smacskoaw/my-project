@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { Header, Footer } from '@/components/site-shell';
 import { ApplicationForm } from '@/components/application-form';
+import { assetPath } from '@/lib/asset-path';
 export default function Home() {
   return (
     <>
@@ -66,7 +67,7 @@ export default function Home() {
             <div className="art-grid" />
             <div className="image-frame">
               <img
-                src="/images/team.svg"
+                src={assetPath('/images/team.svg')}
                 alt="رسم لفريق مهني يتعاون حول مكتب في بيئة عمل حديثة"
                 width="620"
                 height="540"
@@ -126,7 +127,7 @@ export default function Home() {
         <section id="about" className="container about-section">
           <div className="about-visual">
             <img
-              src="/images/growth.svg"
+              src={assetPath('/images/growth.svg')}
               alt="رسم يرمز إلى نمو المهارات والوصول إلى فرصة مهنية"
               width="420"
               height="340"

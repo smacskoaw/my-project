@@ -1,8 +1,61 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // All data access goes through the authenticated/validated Next.js server.
-    // Even a signed-in Firebase browser user cannot read applicants or admins.
+    function admin() {
+      return request.auth != null && request.auth.token.minassatiAdmin == true;
+    }
+    function owner(uid) { return request.auth != null && request.auth.uid == uid; }
+    function uuid(id) { return id.matches('^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'); }
+    function text(value, min, max) { return value is string && value.size() >= min && value.size() <= max; }
+    function validData(d) {
+      return d.keys().hasAll(['fullName','phone','nationality','country','city','age','gender','education','specialty','otherSpecialty','experience','lastJob','employed','skills','notes'])
+        && d.keys().hasOnly(['fullName','phone','nationality','country','city','age','gender','education','specialty','otherSpecialty','experience','lastJob','employed','skills','notes'])
+        && text(d.fullName,3,120) && d.phone is string && d.phone.matches('^[+][1-9][0-9]{6,14}$')
+        && d.nationality in ['عراقي','سوري','أخرى'] && d.country in ['العراق','سوريا']
+        && text(d.city,2,80) && d.age is int && d.age >= 18 && d.age <= 100
+        && d.gender in ['','ذكر','أنثى','أفضل عدم الإجابة']
+        && d.education in ['بدون شهادة','ابتدائي','متوسط','ثانوي','دبلوم','بكالوريوس','ماجستير','دكتوراه']
+        && d.specialty in ['المحاسبة','إدارة الأعمال','المبيعات','التسويق','التسويق الإلكتروني','البرمجة','تقنية المعلومات','التصميم الجرافيكي','الهندسة المدنية','الهندسة الكهربائية','الهندسة الميكانيكية','الهندسة المعمارية','الطب','التمريض','الصيدلة','التعليم','خدمة العملاء','الموارد البشرية','الترجمة','القانون','المطاعم','الفنادق','السائقين','أعمال البناء','الكهرباء','التكييف والتبريد','النجارة','الحدادة','الحلاقة','الخياطة','التصوير','صناعة المحتوى','أخرى']
+        && text(d.otherSpecialty,0,100) && (d.specialty == 'أخرى' ? d.otherSpecialty.size() >= 2 : d.otherSpecialty == '')
+        && d.experience is int && d.experience >= 0 && d.experience <= 80 && d.experience <= d.age - 14
+        && text(d.lastJob,0,150) && d.employed in ['نعم','لا'] && text(d.skills,0,1500) && text(d.notes,0,2000);
+    }
+    function freshApplication(uid, id) {
+      let p = /databases/$(database)/documents/minassati_applications/$(id);
+      return uuid(id) && !exists(p) && getAfter(p).data.owner_uid == uid && getAfter(p).data.created_at == request.time;
+    }
+    match /minassati_applications/{id} {
+      allow read: if admin();
+      allow create: if request.auth != null && uuid(id)
+        && request.resource.data.keys().hasOnly(['data','status','owner_uid','created_at','consented_at'])
+        && request.resource.data.owner_uid == request.auth.uid
+        && request.resource.data.status == 'جديد'
+        && request.resource.data.created_at == request.time
+        && request.resource.data.consented_at == request.time
+        && validData(request.resource.data.data)
+        && getAfter(/databases/$(database)/documents/minassati_submitters/$(request.auth.uid)).data.application_id == id
+        && getAfter(/databases/$(database)/documents/minassati_submitters/$(request.auth.uid)).data.submitted_at == request.time
+        && getAfter(/databases/$(database)/documents/minassati_submitters/$(request.auth.uid)/receipts/$(id)).data.submitted_at == request.time;
+      allow update: if admin() && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+        && request.resource.data.status in ['جديد','تم التواصل','قيد المراجعة','مقبول','مرفوض'];
+      allow delete: if admin();
+    }
+    // Only non-sensitive receipts can be read by the submitting browser.
+    // The rate gate, receipt and application must be committed atomically.
+    match /minassati_submitters/{uid} {
+      allow get: if owner(uid);
+      allow create, update: if owner(uid)
+        && request.resource.data.keys().hasOnly(['submitted_at','application_id'])
+        && request.resource.data.submitted_at == request.time
+        && (!exists(/databases/$(database)/documents/minassati_submitters/$(uid)) || resource.data.submitted_at <= request.time - duration.value(10,'m'))
+        && freshApplication(uid, request.resource.data.application_id);
+      match /receipts/{id} {
+        allow get: if owner(uid);
+        allow create: if owner(uid) && request.resource.data.keys().hasOnly(['submitted_at'])
+          && request.resource.data.submitted_at == request.time && freshApplication(uid, id);
+      }
+    }
+    // Old server accounts, session hashes and counters stay private.
     match /{document=**} {
       allow read, write: if false;
     }

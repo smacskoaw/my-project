@@ -5,6 +5,7 @@ import { Check, CheckCheck, ArrowLeft, Pencil, LoaderCircle, ShieldCheck } from 
 import { applicationSchema, type ApplicationData } from '@/lib/validation';
 import { DRAFT_KEY } from './application-form';
 import { DataDetails } from './data-details';
+import { submitApplication } from '@/lib/browser-store';
 export function Review() {
   const [draft, setDraft] = useState<{ data: ApplicationData; idempotencyKey: string } | null>(
     null,
@@ -35,13 +36,7 @@ export function Review() {
     setBusy(true);
     setError('');
     try {
-      const response = await fetch('/api/applications', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...draft, consent }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
+      const result = await submitApplication({ ...draft, consent });
       setReceipt(result.id);
       setDraft(null);
       try {

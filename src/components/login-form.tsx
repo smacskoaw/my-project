@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { LockKeyhole, LoaderCircle, ArrowLeft, Eye, EyeOff } from 'lucide-react';
+import { loginAdmin } from '@/lib/browser-store';
 export function LoginForm() {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -13,13 +14,7 @@ export function LoginForm() {
     setError('');
     const data = new FormData(e.currentTarget);
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(Object.fromEntries(data)),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error);
+      await loginAdmin(String(data.get('username')), String(data.get('password')));
       router.replace('/admin');
       router.refresh();
     } catch (e) {
