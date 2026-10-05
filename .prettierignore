@@ -1,0 +1,9 @@
+node_modules
+.next
+.tools
+.test-data
+data
+test-results
+package-lock.json
+public/fonts
+next-env.d.ts
