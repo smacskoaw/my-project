@@ -1,0 +1,199 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.nationality",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.city",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.education",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.specialty",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "search_tokens",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "ASCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.nationality",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.city",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.education",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "data.specialty",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "status",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "search_tokens",
+          "arrayConfig": "CONTAINS"
+        },
+        {
+          "fieldPath": "created_at",
+          "order": "DESCENDING"
+        }
+      ]
+    }
+  ],
+  "fieldOverrides": [
+    {
+      "collectionGroup": "minassati_applications",
+      "fieldPath": "data.skills",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "fieldPath": "data.notes",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "fieldPath": "data.lastJob",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "fieldPath": "data.otherSpecialty",
+      "indexes": []
+    },
+    {
+      "collectionGroup": "minassati_applications",
+      "fieldPath": "payload_hash",
+      "indexes": []
+    }
+  ]
+}

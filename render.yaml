@@ -1,0 +1,25 @@
+# Free Node.js web service + your existing Spark Firestore project.
+# This file does not provision a paid database, disk, cron job, or Firebase billing.
+services:
+  - type: web
+    name: minassati
+    runtime: node
+    plan: free
+    buildCommand: npm ci --include=dev && npm run build && npm prune --omit=dev
+    startCommand: npm start -- --hostname 0.0.0.0 --port $PORT
+    healthCheckPath: /
+    envVars:
+      - key: NODE_VERSION
+        value: 24
+      - key: DATABASE_PROVIDER
+        value: firestore
+      - key: FIREBASE_PROJECT_ID
+        value: sgyqkl
+      - key: COOKIE_SECURE
+        value: 'true'
+      - key: TRUST_PROXY
+        value: 'true'
+      - key: RATE_LIMIT_SECRET
+        generateValue: true
+      - key: FIREBASE_SERVICE_ACCOUNT_JSON
+        sync: false

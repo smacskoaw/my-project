@@ -5,6 +5,11 @@
   "engines": {
     "node": ">=24"
   },
+  "overrides": {
+    "gaxios": {
+      "uuid": "^11.1.1"
+    }
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -13,12 +18,19 @@
     "test": "tsx --test tests/*.test.ts",
     "admin:create": "tsx scripts/create-admin.ts",
     "test:e2e": "playwright test",
+    "firebase:check": "tsx scripts/check-firebase.ts",
+    "firebase:cleanup": "tsx scripts/cleanup-firestore.ts",
+    "firebase:indexes": "tsx scripts/generate-firestore-indexes.ts",
+    "firebase:rules": "firebase deploy --only firestore --project sgyqkl",
+    "test:firestore": "node scripts/run-firestore-emulator.mjs unit",
+    "test:e2e:firestore": "node scripts/run-firestore-emulator.mjs e2e",
     "format": "prettier --write src scripts tests *.ts *.json README.md",
     "format:check": "prettier --check src scripts tests *.ts *.json README.md"
   },
   "dependencies": {
     "@electric-sql/pglite": "^0.3.14",
     "dotenv": "^17.2.3",
+    "firebase-admin": "^14.5.0",
     "libphonenumber-js": "^1.12.24",
     "lucide-react": "^0.468.0",
     "next": "^16.0.0",
@@ -33,6 +45,7 @@
     "@types/pg": "^8.15.6",
     "@types/react": "^19.2.2",
     "@types/react-dom": "^19.2.2",
+    "firebase-tools": "^15.32.1",
     "prettier": "^3.9.9",
     "tsx": "^4.20.6",
     "typescript": "^5.9.3"

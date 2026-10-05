@@ -17,7 +17,14 @@ export default defineConfig({
     url: 'http://localhost:3000',
     reuseExistingServer: false,
     timeout: 120000,
-    env: { DATABASE_DIR: '.test-data/e2e', APP_ORIGIN: 'http://localhost:3000', DATABASE_URL: '' },
+    env: {
+      DATABASE_DIR: '.test-data/e2e',
+      APP_ORIGIN: 'http://localhost:3000',
+      DATABASE_URL: '',
+      DATABASE_PROVIDER: process.env.E2E_DATABASE_PROVIDER || 'postgres',
+      FIREBASE_PROJECT_ID: 'demo-minassati',
+      FIRESTORE_EMULATOR_HOST: process.env.FIRESTORE_EMULATOR_HOST || '',
+    },
   },
   reporter: 'list',
 });

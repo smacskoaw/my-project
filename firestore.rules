@@ -1,0 +1,10 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // All data access goes through the authenticated/validated Next.js server.
+    // Even a signed-in Firebase browser user cannot read applicants or admins.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

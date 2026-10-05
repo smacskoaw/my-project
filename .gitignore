@@ -14,3 +14,12 @@ data/
 test-results/
 playwright-report/
 .test-data/
+.secrets/
+*service-account*.json
+*firebase-adminsdk*.json
+.firebase/
+firebase-debug.log*
+firestore-debug.log*
+ui-debug.log*
+*.pem
+*.key

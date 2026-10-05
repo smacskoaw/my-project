@@ -1,6 +1,9 @@
 import { query } from './db';
 import { normalizeDigits, type ApplicationRecord } from './validation';
+import { databaseProvider } from './runtime-config';
 export async function listApplications(params: URLSearchParams) {
+  if (databaseProvider() === 'firestore')
+    return (await import('./firestore-store')).listApplications(params);
   const values: unknown[] = [];
   const where: string[] = [];
   const add = (clause: string, value: unknown) => {
